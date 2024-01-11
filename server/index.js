@@ -6,21 +6,39 @@ import cors from "cors";
 import { S3Client,PutObjectCommand} from "@aws-sdk/client-s3";
 import File from "./Models/File.js";
 import { getFile,deleteFile } from "./Functions/Getfile.js";
+import { Signup } from "./Functions/Signup.js";
 
 
 const app = express();
 app.use(cors());
 dotenv.config();
 
+
+
+const storage = multer.memoryStorage()
+const upload = multer({ storage: storage })
+
+const storage2 = multer.diskStorage({
+  destination: function (req, file, cb) {
+   return cb(null, "public/assets");
+  },
+  filename: function (req, file, cb) {
+    return cb(null, file.originalname);
+    //return cb(null, `${Date.now()}-${file.originalname}`);
+  },
+}); 
+const upload2=multer({storage:storage2});
+
+
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
 app.get('/getfile',getFile);
+app.post('/auth/register',upload2.single('picture'),Signup)
+app.delete('/deletefile/:id',deleteFile);
 
 
-const storage = multer.memoryStorage()
-const upload = multer({ storage: storage })
 
 const bucketName=process.env.BUCKET_NAME;
 const bucketRegion=process.env.BUCKET_REGION;
@@ -66,7 +84,7 @@ app.post("/api/posts",upload.single('image'),async(req,res)=>{
     res.send({});
 })
 
-app.delete('/deletefile/:id',deleteFile);
+
 
 const PORT = process.env.PORT || 6001;
 mongoose
