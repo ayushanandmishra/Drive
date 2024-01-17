@@ -22,6 +22,13 @@ import Tooltip from '@mui/material/Tooltip';
 import Avatar from '@mui/material/Avatar';
 import MenuItem from '@mui/material/MenuItem';
 import DashHeader from '../DashHeader/DashHeader';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { setLogout } from '../../reduxStore/state';
+import NewPost from '../NewPost.jsx'
+import UploadComponent from '../Upload/UploadComponent.jsx';
+import FileRender from '../FileList/FileRender.jsx'
+import { useMediaQuery } from '@mui/material';
 
 const drawerWidth = 240;
 
@@ -30,8 +37,14 @@ function ResponsiveDrawer(props) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const user = useSelector((state) => state.user);
+  const picturePath = user.picturePath;
+  const isNonMobileScreens = useMediaQuery("(min-width:390px)");
+  const [reRender,setreRender]=React.useState(false);
 
-  const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+  const settings = ['Profile', 'Account', 'Dashboard'];
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -48,16 +61,21 @@ function ResponsiveDrawer(props) {
     }
   };
 
-  
-const handleOpenUserMenu = (event) => {
+
+  const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
-};
+  };
 
 
 
-const handleCloseUserMenu = () => {
+  const handleCloseUserMenu = () => {
     setAnchorElUser(null);
-};
+  };
+
+  const handleLogout = () => {
+    dispatch(setLogout());
+    navigate('/');
+  }
 
   const drawer = (
     <div>
@@ -86,59 +104,62 @@ const handleCloseUserMenu = () => {
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <AppBar
-      position="fixed"
-      sx={{
-        width: { sm: `calc(100% - ${drawerWidth}px)` },
-        ml: { sm: `${drawerWidth}px` },
-      }}
-    >
-      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <AdbIcon sx={{ display: { xs: 'flex', }, mr: 1 }} />
-          <Typography variant="h6" noWrap component="div">
-            Drive
-          </Typography>
-        </Box>
-        <Box>
-          <Tooltip title="Open settings">
-            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-              <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+        position="fixed"
+        sx={{
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          ml: { sm: `${drawerWidth}px` },
+        }}
+      >
+        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2, display: { sm: 'none' } }}
+            >
+              <MenuIcon />
             </IconButton>
-          </Tooltip>
-          <Menu
-            sx={{ mt: '45px' }}
-            id="menu-appbar"
-            anchorEl={anchorElUser}
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            keepMounted
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            open={Boolean(anchorElUser)}
-            onClose={handleCloseUserMenu}
-          >
-            {settings.map((setting) => (
-              <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                <Typography textAlign="center">{setting}</Typography>
+            <AdbIcon sx={{ display: { xs: 'flex', }, mr: 1 }} />
+            <Typography variant="h6" noWrap component="div">
+              Drive
+            </Typography>
+          </Box>
+          <Box>
+            <Tooltip sx={{ marginLeft: isNonMobileScreens ? 0 : 2 }} title="Open settings">
+              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                <Avatar src={`http://localhost:3001/assets/${picturePath}`} alt="Remy Sharp" />
+              </IconButton>
+            </Tooltip>
+            <Menu
+              sx={{ mt: '45px' }}
+              id="menu-appbar"
+              anchorEl={anchorElUser}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              open={Boolean(anchorElUser)}
+              onClose={handleCloseUserMenu}
+            >
+              {settings.map((setting) => (
+                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                  <Typography textAlign="center">{setting}</Typography>
+                </MenuItem>
+              ))}
+              <MenuItem onClick={handleLogout}>
+                <Typography textAlign="center">Logout</Typography>
               </MenuItem>
-            ))}
-          </Menu>
-        </Box>
-      </Toolbar>
-    </AppBar>
+            </Menu>
+          </Box>
+        </Toolbar>
+      </AppBar>
       <Box
         component="nav"
         sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
@@ -161,7 +182,7 @@ const handleCloseUserMenu = () => {
         >
           {drawer}
         </Drawer>
-        
+
         <Drawer
           variant="permanent"
           sx={{
@@ -172,17 +193,20 @@ const handleCloseUserMenu = () => {
         >
           {drawer}
         </Drawer>
-      
-       
+
+
       </Box>
       <Box
         component="main"
         sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
       >
-        
+
         <Toolbar />
 
-        <DashHeader/>
+        <DashHeader />
+        {/* <NewPost/> */}
+        <UploadComponent change={setreRender} />
+        <FileRender change={setreRender} />
       </Box>
     </Box>
   );

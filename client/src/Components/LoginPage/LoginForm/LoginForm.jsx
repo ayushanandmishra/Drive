@@ -13,6 +13,10 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import loginImage from './loginImage.jpg'
+import { useNavigate } from 'react-router-dom';
+import {useDispatch} from 'react-redux'
+import { setLogin } from '../../../reduxStore/state';
+
 
 
 function Copyright(props) {
@@ -34,7 +38,8 @@ const defaultTheme = createTheme();
 
 export default function SignInSide() {
   
-
+  const navigate=useNavigate();
+  const dispatch=useDispatch();
 
   const [isWrongPassword,setWrongPassword]=React.useState(false);
 
@@ -55,7 +60,7 @@ export default function SignInSide() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    console.log(formData);
+
 
     const loggedInResponse = await fetch(
       "http://localhost:3001/auth/login",
@@ -68,9 +73,25 @@ export default function SignInSide() {
     );
     const loggedIn=await loggedInResponse.json();
     console.log(loggedIn);
-   
+      
+    if (loggedIn.token) {
+      dispatch(
+        setLogin({
+          user: loggedIn.person,
+          token: loggedIn.token,
+        })
+      );
+      navigate('/');
+    }
+    else
+    {
+      setWrongPassword(true);
+      // setFormData({email:"",password:""});
+    }
 
   };
+
+  
 
 
 
@@ -134,10 +155,6 @@ export default function SignInSide() {
                 onChange={handleChange}
               />
               {isWrongPassword && <p style={{color:'red'}}>Invalid Credestials</p>}
-              <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
-              />
               <Button
                 type="submit"
                 fullWidth
@@ -147,13 +164,9 @@ export default function SignInSide() {
                 Sign In
               </Button>
               <Grid container>
-                <Grid item xs>
-                  <Link href="#" variant="body2">
-                    Forgot password?
-                  </Link>
-                </Grid>
+                
                 <Grid item>
-                  <Link variant="body2" style={{cursor:'pointer'}}>
+                  <Link onClick={()=>{navigate('/signup')}} variant="body2" style={{cursor:'pointer'}}>
                     {"Don't have an account? Sign Up"}
                   </Link>
                 </Grid>

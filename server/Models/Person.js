@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import File from './File.js'
 
 const PersonSchema=new mongoose.Schema({
     firstName: {
@@ -27,7 +28,16 @@ const PersonSchema=new mongoose.Schema({
       picturePath: {
         type: String,
         default: "",
-      }
+      },
+      userfilesId: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'File', // Assuming you have a File model defined
+    }],
+    sharedFilesIds: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'File', // Assuming you have a File model defined
+    }],
+
 });
 
 const Person=mongoose.model('Person',PersonSchema);

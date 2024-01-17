@@ -38,10 +38,12 @@ export async function Signup(req,res)
 
 export const login=async(req,res)=>{
 
+    console.log("inside login function");
     try
-    {
+    {   
         const {email,password}=req.body;
         const person=await Person.findOne({email:email});
+        console.log(person);
 
         if(!person)
         {
@@ -55,11 +57,11 @@ export const login=async(req,res)=>{
             return res.status(400).json({ msg: "Invalid credentials. " });
         }
 
-        const objectToSerialize = { id: findUser._id };
+        const objectToSerialize = { id: person._id };
 
         const accessToken = jwt.sign(
             objectToSerialize,
-            process.env.JWT_TOKEN_SEECRET
+            process.env.JWT_TOKEN_SECRET
         );
 
         delete person.password;
@@ -72,5 +74,4 @@ export const login=async(req,res)=>{
         res.send({error_message:err.message})
     }
    
-
 }

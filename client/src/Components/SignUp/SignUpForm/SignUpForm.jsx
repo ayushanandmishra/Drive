@@ -210,7 +210,7 @@ export default function SignUpForm() {
                         </Button>
                         <Grid container>
                             <Grid item>
-                                <Link style={{ cursor: 'pointer' }} variant="body2">
+                                <Link onClick={()=>{navigate('/')}} style={{ cursor: 'pointer' }} variant="body2">
                                     {"Already have an account?"}
                                 </Link>
                             </Grid>

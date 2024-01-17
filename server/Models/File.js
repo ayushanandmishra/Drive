@@ -3,7 +3,11 @@ import mongoose from "mongoose";
 const FileSchema=mongoose.Schema(
     {
         fileName:String,
-        fileType:String
+        fileType:String,
+        fileOwner:String,
+        fileOwnerId:String,
+        fileOwnerEmail:String,
+        fileSize:Number
     }
 )
 

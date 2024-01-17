@@ -1,4 +1,5 @@
 import File from "../Models/File.js";
+import Person from "../Models/Person.js";
 import {
   S3Client,
   GetObjectCommand,
@@ -17,6 +18,11 @@ export const getFile = async (req, res) => {
   const access_key = process.env.ACCESS_KEY;
   const secret_access_key = process.env.SECRET_ACCESS_KEY;
 
+  const {userId}=req.params;
+
+  const user=await Person.findById(userId);
+
+
   const s3 = new S3Client({
     credentials: {
       accessKeyId: access_key,
@@ -26,7 +32,10 @@ export const getFile = async (req, res) => {
   });
   console.log("inside getFile");
   try {
-    const files = await File.find({});
+    // const files = await File.find({});
+
+    const userFilesIds = user.userfilesId;
+    const files = await File.find({ _id: { $in: userFilesIds } });
 
     const filesWithUrls = await Promise.all(files.map(async (file) => {
         const getObjectParams = {
