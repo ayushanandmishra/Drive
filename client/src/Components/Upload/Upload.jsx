@@ -4,6 +4,8 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { Box, useMediaQuery } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useSelector } from "react-redux"
+import { setRender } from '../../reduxStore/state';
+import { useDispatch } from 'react-redux';
 import './Upload.css';
 
 
@@ -12,6 +14,8 @@ const FileUpload = ({ onFileUpload }) => {
   const isNonMobileScreens = useMediaQuery('(min-width:820px)');
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
+  const rerender=useSelector((state)=>state.render);
+  const dispatch=useDispatch();
 
   const handleFileChange = (event) => {
     const files = event.target.files;
@@ -35,6 +39,11 @@ const FileUpload = ({ onFileUpload }) => {
       body: formData,
     });
 
+    dispatch(
+      setRender({
+          render:!rerender
+      })
+  )
     return response;
   }
 

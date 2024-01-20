@@ -34,10 +34,9 @@ import { useParams } from 'react-router-dom';
 import FolderIcon from '@mui/icons-material/Folder';
 import FolderSharedIcon from '@mui/icons-material/FolderShared';
 
-
 const drawerWidth = 240;
 
-function ResponsiveDrawer(props) {
+function ResponsiveDrawer2(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
@@ -90,7 +89,6 @@ function ResponsiveDrawer(props) {
       <Toolbar />
       <Divider />
       <List>
-        
       <ListItem disablePadding>
             <ListItemButton onClick={()=>{navigate('/')}}>
               <ListItemIcon>
@@ -223,14 +221,14 @@ function ResponsiveDrawer(props) {
         <DashHeader />
         {/* <NewPost/> */}
         <UploadComponent />
-        <FileRender />
-        
+        {/* <FileRender /> */}
+        <SharedFilesRender/>
       </Box>
     </Box>
   );
 }
 
-ResponsiveDrawer.propTypes = {
+ResponsiveDrawer2.propTypes = {
   /**
    * Injected by the documentation to work in an iframe.
    * Remove this when copying and pasting into your project.
@@ -238,4 +236,4 @@ ResponsiveDrawer.propTypes = {
   window: PropTypes.func,
 };
 
-export default ResponsiveDrawer;
+export default ResponsiveDrawer2;

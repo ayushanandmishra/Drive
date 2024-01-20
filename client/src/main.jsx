@@ -18,7 +18,7 @@ import { persistStore,
   import { PersistGate } from 'redux-persist/integration/react';
 
   const persistConfig = {
-    key: 'frive',
+    key: 'drive',
     version: 1,
     storage,
     

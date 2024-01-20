@@ -6,12 +6,20 @@ import Typography from '@mui/material/Typography';
 import './DashHeader.css';
 import { useSelector } from 'react-redux';
 import InfoPopup from './infopopup';
+import {setRender} from '../../reduxStore/state.js'
+import {useDispatch} from 'react-redux'
+import Button from '@mui/material/Button';
 
 export default function DashHeader() {
 
     const user = useSelector((state) => state.user);
     const token = useSelector((state) => state.token);
+    
+    const dispatch=useDispatch();
+    
     const isNonMobileScreens = useMediaQuery("(min-width:820px)");
+    const rerender2=useSelector((state)=>state.render);
+    console.log(rerender2);
   
     return (
         <Box sx={{display:'flex',justifyContent: 'space-between'}}>

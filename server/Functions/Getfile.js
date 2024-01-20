@@ -13,7 +13,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 export const getFile = async (req, res) => {
 
-    const bucketName = process.env.BUCKET_NAME;
+  const bucketName = process.env.BUCKET_NAME;
   const bucketRegion = process.env.BUCKET_REGION;
   const access_key = process.env.ACCESS_KEY;
   const secret_access_key = process.env.SECRET_ACCESS_KEY;

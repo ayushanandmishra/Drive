@@ -11,7 +11,7 @@ import { getFile,deleteFile } from "./Functions/Getfile.js";
 import { Signup,login } from "./Functions/Signup.js";
 import { verifytoken } from "./authentication/auth.js";
 import Person from "./Models/Person.js";
-
+import {shareFile,getSharedFiles} from "./Functions/ShareFile.js";
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -39,14 +39,15 @@ const storage2 = multer.diskStorage({
 const upload2=multer({storage:storage2});
 
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
 
 app.get('/getfile/:userId',getFile);
+app.get('/getsharedfile/:userId',getSharedFiles);
 app.post('/auth/login',login)
 app.post('/auth/register',upload2.single('picture'),Signup)
 app.delete('/deletefile/:id',deleteFile);
+app.post('/sharefile',shareFile)
+
+
 
 
 

@@ -4,7 +4,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
-import Avatar from '@mui/material/Avatar';
+
 import Typography from '@mui/material/Typography';
 import { Box } from '@mui/material';
 import Menu from '@mui/material/Menu';
@@ -15,20 +15,59 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DownloadIcon from '@mui/icons-material/Download';
 import ShareIcon from '@mui/icons-material/Share';
 import DeleteIcon from '@mui/icons-material/Delete';
-import InfoIcon from '@mui/icons-material/Info';
+
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import ImageIcon from '@mui/icons-material/Image';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { useMediaQuery } from '@mui/material';
+import { setRender } from '../../reduxStore/state';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import ModalViewer from './ModalViewer';
+import { useState,useEffect } from 'react';
+import ShareFileModal from './ShareFileModal';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const File = ({ fileName, fileType, fileOwner, fileSize = 32456, fileId }) => {
+
+const File = ({ fileName, fileType, fileOwner, fileSize = 32456, fileId, fileurl }) => {
 
     const [mobileOpen, setMobileOpen] = React.useState(false);
     const [isClosing, setIsClosing] = React.useState(false);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
-
-    const settings = ['Download', 'Share', 'Delete', 'FIle Info'];
+    const rerender = useSelector((state) => state.render);
     const isNonMobileScreens = useMediaQuery("(min-width:820px)");
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const [isModalOpen, setModalOpen] = useState(false);
+    const [isShareModalOpen, setShareModalOpen] = useState(false);
+    const [msg, setMsg] = useState('');
+
+    const handleFileClick = () => {
+        setModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setModalOpen(false);
+    };
+
+    const handleOpenShareModal = () => {
+        setShareModalOpen(true);
+    };
+
+    const handleCloseShareModal = () => {
+        setShareModalOpen(false);
+    };
+
+    const handleShareFile = (sharedEmails) => {
+        // Implement your file-sharing logic here using the sharedEmails
+        console.log('Sharing file with emails:', sharedEmails);
+        // You can make an API call to share the file with the listed emails
+        // Close the modal after sharing
+        handleCloseShareModal();
+    };
+
+
 
     const handleDrawerClose = () => {
         setIsClosing(true);
@@ -80,17 +119,44 @@ const File = ({ fileName, fileType, fileOwner, fileSize = 32456, fileId }) => {
         catch (err) {
             console.log({ message: err.message });
         }
+
+        dispatch(
+            setRender({
+                render: !rerender
+            }))
     }
 
-    return (
-        <ListItem>
+    const fileOpen = () => {
+
+        const encfileUrl = encodeURIComponent(fileurl);
+        const encfileType = encodeURIComponent(fileType);
+
+        console.log(encfileType);
+        console.log(encfileUrl);
+        console.log(fileurl)
+        navigate(`/file/${encfileUrl}/${encfileType}`);
+    }
+
+    useEffect(() => {
+        if (msg) {
+            toast(msg, { autoClose: 3000 });
+        }
+    }, [msg]);
+
+    return ( 
+        <ListItem sx={{}}>
             <ListItemIcon>
                 {Icon()}
             </ListItemIcon>
             <ListItemText>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Box>
-                        <Typography variant="h6">{isNonMobileScreens ? fileName : fileName.substring(0, 9) + "..."}</Typography>
+                        <Typography onClick={handleFileClick} sx={{
+                            textDecoration: 'none', '&:hover': {
+                                textDecoration: 'underline', // Underline on hover
+                                cursor: 'pointer'
+                            }
+                        }} variant="h6">{isNonMobileScreens ? fileName : fileName.substring(0, 9) + "..."}</Typography>
                         <Typography variant="subtitle2" color="textSecondary">
                             Owner: {fileOwner}
                         </Typography>
@@ -133,7 +199,7 @@ const File = ({ fileName, fileType, fileOwner, fileSize = 32456, fileId }) => {
                                     <span>Download</span>
                                 </Typography>
                             </MenuItem>
-                            <MenuItem sx={{ display: 'flex', alignItems: 'center' }} onClick={handleCloseUserMenu}>
+                            <MenuItem sx={{ display: 'flex', alignItems: 'center' }} onClick={() => { handleOpenShareModal(); handleCloseUserMenu() }}>
                                 <Typography textAlign="center">
                                     <ShareIcon sx={{ mr: 1 }} fontSize='small' />
                                     <span>Share</span>
@@ -147,6 +213,21 @@ const File = ({ fileName, fileType, fileOwner, fileSize = 32456, fileId }) => {
                             </MenuItem>
                         </Menu>
                     </Box>
+                </Box>
+                <Box>
+                    {isModalOpen && <ModalViewer fileurl={fileurl} fileType={fileType} onClose={closeModal}  />}
+                </Box>
+                <Box>
+                    {isShareModalOpen && <ShareFileModal
+                        open={isShareModalOpen}
+                        onClose={handleCloseShareModal}
+                        onShare={handleShareFile}
+                        fileId={fileId}
+                        setMsg={setMsg}
+                    />}
+                </Box>
+                <Box>
+                    <ToastContainer />
                 </Box>
             </ListItemText>
         </ListItem>
@@ -164,6 +245,7 @@ const FileList = ({ files }) => {
                     fileOwner={file.fileOwner}
                     fileType={file.fileType}
                     fileSize={file.fileSize}
+                    fileurl={file.fileurl}
                 />
             ))}
         </List>

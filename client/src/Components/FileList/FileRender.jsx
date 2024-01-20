@@ -3,6 +3,7 @@ import FileList from './FileList';
 import { useEffect, useState } from "react";
 import { useSelector } from 'react-redux';
 
+
 const filess = [
   { filename: 'Document.pdf', fileOwner: 'John Doe', fileType: 'pdf' },
   { filename: 'Spreadsheet.txt', fileOwner: 'Jane Smith', fileType: 'txt' },
@@ -10,10 +11,11 @@ const filess = [
   { filename: 'Spreadsheet.img', fileOwner: 'Jane Smith', fileType: 'image' },
 ];
 
-const App = ({change}) => {
+const App = () => {
 
   const [files,setFiles]=useState([]);
   const user=useSelector((state)=>state.user);
+  const render=useSelector((state)=>state.render);
   const id=user._id;
   console.log(id);
   const formData=new FormData();
@@ -29,6 +31,9 @@ const App = ({change}) => {
     useEffect(()=>{
       getFile();
     },[]);
+    useEffect(()=>{
+      getFile();
+    },[render]);
 
 
   return (
