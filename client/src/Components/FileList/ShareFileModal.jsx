@@ -51,11 +51,7 @@ const ShareFileModal = ({ open, onClose, onShare, fileId,setMsg }) => {
       
   };
 
-  const testing = () => {
-    console.log(formData.get('email'));
-    console.log(formData.get('fileId'));
-    console.log('testing');
-  };
+ 
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -88,9 +84,7 @@ const ShareFileModal = ({ open, onClose, onShare, fileId,setMsg }) => {
           Share
         </Button>
 
-        <Button onClick={testing}>
-          Test
-        </Button>
+       
        
       </DialogActions>
     </Dialog>

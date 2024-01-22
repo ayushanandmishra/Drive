@@ -24,24 +24,55 @@ import { setRender } from '../../reduxStore/state';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import ModalViewer from './ModalViewer';
-import { useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import ShareFileModal from './ShareFileModal';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import FolderSharedIcon from '@mui/icons-material/FolderShared';
+import ShareWithModal from './SharedWithModal';
+import DeleteConfirmationModal from './DeleteConfirmModal';
+import VideoFileIcon from '@mui/icons-material/VideoFile';
 
 
-const File = ({ fileName, fileType, fileOwner, fileSize = 32456, fileId, fileurl }) => {
+const File = ({ fileName, fileType, fileOwner, fileSize = 32456, fileId, fileurl, sharedFiles }) => {
 
     const [mobileOpen, setMobileOpen] = React.useState(false);
     const [isClosing, setIsClosing] = React.useState(false);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
     const rerender = useSelector((state) => state.render);
+    const user = useSelector((state) => state.user);
+    const token = useSelector((state) => state.token);
+    const userId = user._id;
     const isNonMobileScreens = useMediaQuery("(min-width:820px)");
+    const isNonMobileScreens2 = useMediaQuery("(min-width:1000px)");
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [isModalOpen, setModalOpen] = useState(false);
     const [isShareModalOpen, setShareModalOpen] = useState(false);
+    const [isSharedWithOpen, setSharedWithModalOpen] = useState(false);
+    const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
     const [msg, setMsg] = useState('');
+
+    const handleDeleteClick = () => {
+        // Set the state to open the modal
+        setDeleteModalOpen(true);
+        handleCloseUserMenu();
+
+    };
+
+    const handleConfirmDelete = async () => {
+        // Perform the delete action here
+        // Close the modal after deletion
+        await handleDelete();
+        setDeleteModalOpen(false);
+    };
+
+    const handleCloseModal = () => {
+        // Handle the case when the user closes the modal without confirming
+        setDeleteModalOpen(false);
+        handleCloseUserMenu();
+    };
+
 
     const handleFileClick = () => {
         setModalOpen(true);
@@ -58,6 +89,14 @@ const File = ({ fileName, fileType, fileOwner, fileSize = 32456, fileId, fileurl
     const handleCloseShareModal = () => {
         setShareModalOpen(false);
     };
+
+    const handleOpenSharedWith = () => {
+        setSharedWithModalOpen(true);
+        handleCloseUserMenu();
+    }
+    const handleCloseSharedWith = () => {
+        setSharedWithModalOpen(false);
+    }
 
     const handleShareFile = (sharedEmails) => {
         // Implement your file-sharing logic here using the sharedEmails
@@ -93,13 +132,14 @@ const File = ({ fileName, fileType, fileOwner, fileSize = 32456, fileId, fileurl
     };
 
     const Icon = () => {
-        if (fileType === 'video') {
-            return (<PlayArrowIcon />)
-        } else if (fileType === 'image') {
+        if (['webm', 'mp4', '3gpp', 'mov', 'avi','mkv','ts'].includes(fileType)) {
+            return (<VideoFileIcon />)
+        } else if (['jpeg','jpg', 'png', 'gif', 'tiff', 'bmp','jfif'].includes(fileType)) {
             return (<ImageIcon />)
         } else if (fileType === 'pdf') {
             return (<PictureAsPdfIcon />)
-        } else {
+        }
+         else {
             return (<InsertDriveFileIcon />);
         }
     }
@@ -111,9 +151,12 @@ const File = ({ fileName, fileType, fileOwner, fileSize = 32456, fileId, fileurl
     const handleDelete = async () => {
 
         try {
-            const response = await fetch(`http://localhost:3001/deletefile/${fileId}`,
+            const response = await fetch(`http://localhost:3001/deletefile/${fileId}/${userId}`,
                 {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: {
+                        authorization: `Bearer ${token}`
+                    }
                 })
         }
         catch (err) {
@@ -126,38 +169,59 @@ const File = ({ fileName, fileType, fileOwner, fileSize = 32456, fileId, fileurl
             }))
     }
 
-    const fileOpen = () => {
-
-        const encfileUrl = encodeURIComponent(fileurl);
-        const encfileType = encodeURIComponent(fileType);
-
-        console.log(encfileType);
-        console.log(encfileUrl);
-        console.log(fileurl)
-        navigate(`/file/${encfileUrl}/${encfileType}`);
+    function formatFileSize(bytes) {
+        const KB = 1024;
+        const MB = 1024 * KB;
+        const GB = 1024 * MB;
+    
+        if (bytes < MB) {
+            // Convert to KB
+            const sizeInKB = (bytes / KB).toFixed(2);
+            return `${sizeInKB} KB`;
+        } else if (bytes < GB) {
+            // Convert to MB
+            const sizeInMB = (bytes / MB).toFixed(2);
+            return `${sizeInMB} MB`;
+        } else {
+            // Convert to GB
+            const sizeInGB = (bytes / GB).toFixed(2);
+            return `${sizeInGB} GB`;
+        }
     }
 
+    const onDownload = () => {
+        window.open(fileurl, '_blank')
+    };
     useEffect(() => {
         if (msg) {
-            toast(msg, { autoClose: 3000 });
+            window.alert(msg);
+            setMsg('');  // Clear the message after showing the alert
         }
     }, [msg]);
 
-    return ( 
-        <ListItem sx={{}}>
+
+    return (
+        <ListItem sx={{
+            "&:hover": {
+                backgroundColor: "#f0f0f0", // Change the background color on hover
+            },
+            mb: 1,
+            cursor: 'pointer'
+        }}>
             <ListItemIcon>
                 {Icon()}
             </ListItemIcon>
             <ListItemText>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Box>
-                        <Typography onClick={handleFileClick} sx={{
+                    <Box onClick={handleFileClick}  sx={{ width: (isNonMobileScreens ? '33%' : '48%') }}>
+                        <Typography sx={{
                             textDecoration: 'none', '&:hover': {
                                 textDecoration: 'underline', // Underline on hover
-                                cursor: 'pointer'
-                            }
+                                cursor: 'pointer',
+                            },
+                            fontSize: (isNonMobileScreens2 ? '1.1rem' : '0.9rem')
                         }} variant="h6">{isNonMobileScreens ? fileName : fileName.substring(0, 9) + "..."}</Typography>
-                        <Typography variant="subtitle2" color="textSecondary">
+                        <Typography sx={{ fontSize: (isNonMobileScreens2 ? '0.84rem' : '0.65rem') }} variant="subtitle2" color="textSecondary">
                             Owner: {fileOwner}
                         </Typography>
                     </Box>
@@ -166,11 +230,18 @@ const File = ({ fileName, fileType, fileOwner, fileSize = 32456, fileId, fileurl
                             Type: {fileType}
                         </Typography>
                     </Box> */}
-                    <Box>
-                        <Typography variant="subtitle2" color="textSecondary">
-                            Size: {fileSize}
+                    <Box sx={{ width: '13%', cursor: 'pointer' }}>
+                        <Typography sx={{ textAlign: 'center', fontSize: (isNonMobileScreens2 ? '0.8rem' : '0.65rem') }} variant="subtitle2" color="textSecondary">
+                            {fileType}
                         </Typography>
                     </Box>
+
+                    <Box sx={{ width: '13%', fontSize: (isNonMobileScreens2 ? '2rem' : '1rem'), cursor: 'pointer' }}>
+                        <Typography sx={{ textAlign: 'center', fontSize: (isNonMobileScreens2 ? '0.8rem' : '0.6rem') }} variant="subtitle2" color="textSecondary">
+                            {formatFileSize(fileSize)}
+                        </Typography>
+                    </Box>
+
                     <Box>
                         <Tooltip title="Open settings">
                             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -178,7 +249,7 @@ const File = ({ fileName, fileType, fileOwner, fileSize = 32456, fileId, fileurl
                             </IconButton>
                         </Tooltip>
                         <Menu
-                            sx={{ mt: '45px' }}
+                            sx={{ mt: '10px' }}
                             id="menu-appbar"
                             anchorEl={anchorElUser}
                             anchorOrigin={{
@@ -193,29 +264,35 @@ const File = ({ fileName, fileType, fileOwner, fileSize = 32456, fileId, fileurl
                             open={Boolean(anchorElUser)}
                             onClose={handleCloseUserMenu}
                         >
-                            <MenuItem onClick={() => { console.log('download'); handleCloseUserMenu(); }}>
+                            <MenuItem onClick={() => { onDownload(); handleCloseUserMenu(); }}>
                                 <Typography sx={{ display: 'flex', alignItems: 'center' }} textAlign="center">
-                                    <DownloadIcon sx={{ mr: 1 }} fontSize='small' />
-                                    <span>Download</span>
+                                    <DownloadIcon sx={{ mr: 1 }} fontSize='1rem' />
+                                    <span style={{ fontSize: '0.9rem' }}>Download</span>
                                 </Typography>
                             </MenuItem>
-                            <MenuItem sx={{ display: 'flex', alignItems: 'center' }} onClick={() => { handleOpenShareModal(); handleCloseUserMenu() }}>
+                            {!sharedFiles && <MenuItem sx={{ display: 'flex', alignItems: 'center' }} onClick={() => { handleOpenShareModal(); handleCloseUserMenu() }}>
                                 <Typography textAlign="center">
-                                    <ShareIcon sx={{ mr: 1 }} fontSize='small' />
-                                    <span>Share</span>
+                                    <ShareIcon sx={{ mr: 1 }} fontSize='1rem' />
+                                    <span style={{ fontSize: '0.9rem' }}>Share</span>
                                 </Typography>
-                            </MenuItem>
-                            <MenuItem sx={{ display: 'flex', alignItems: 'center' }} onClick={handleDelete}>
+                            </MenuItem>}
+                            {!sharedFiles && <MenuItem sx={{ display: 'flex', alignItems: 'center' }} onClick={handleDeleteClick}>
                                 <Typography textAlign="center">
-                                    <DeleteIcon sx={{ mr: 1 }} fontSize='small' />
-                                    <span>Delete</span>
+                                    <DeleteIcon sx={{ mr: 1 }} fontSize='1rem' />
+                                    <span style={{ fontSize: '0.9rem' }}>Delete</span>
+                                </Typography>
+                            </MenuItem>}
+                            <MenuItem sx={{ display: 'flex', alignItems: 'center' }} onClick={handleOpenSharedWith}>
+                                <Typography textAlign="center">
+                                    <FolderSharedIcon sx={{ mr: 1 }} fontSize='1rem' />
+                                    <span style={{ fontSize: '0.9rem' }}>Shared With</span>
                                 </Typography>
                             </MenuItem>
                         </Menu>
                     </Box>
                 </Box>
                 <Box>
-                    {isModalOpen && <ModalViewer fileurl={fileurl} fileType={fileType} onClose={closeModal}  />}
+                    {isModalOpen && <ModalViewer fileurl={fileurl} fileType={fileType} onClose={closeModal} />}
                 </Box>
                 <Box>
                     {isShareModalOpen && <ShareFileModal
@@ -227,14 +304,25 @@ const File = ({ fileName, fileType, fileOwner, fileSize = 32456, fileId, fileurl
                     />}
                 </Box>
                 <Box>
-                    <ToastContainer />
+                    {isSharedWithOpen && <ShareWithModal fileId={fileId} onClose={handleCloseSharedWith} />}
                 </Box>
+                <Box>
+                    {isDeleteModalOpen && <DeleteConfirmationModal
+                        open={isDeleteModalOpen}
+                        onClose={handleCloseModal}
+                        onConfirm={handleConfirmDelete}
+                        fileName={fileName}
+                    />}
+                </Box>
+                {/* <Box>
+                    <ToastContainer />
+                </Box> */}
             </ListItemText>
         </ListItem>
     );
 };
 
-const FileList = ({ files }) => {
+const FileList = ({ files, sharedFiles }) => {
     return (
         <List>
             {files.map((file, index) => (
@@ -246,6 +334,7 @@ const FileList = ({ files }) => {
                     fileType={file.fileType}
                     fileSize={file.fileSize}
                     fileurl={file.fileurl}
+                    sharedFiles={sharedFiles}
                 />
             ))}
         </List>

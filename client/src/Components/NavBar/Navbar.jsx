@@ -33,6 +33,7 @@ import SharedFilesRender from '../FileList/SharedFilesRender.jsx';
 import { useParams } from 'react-router-dom';
 import FolderIcon from '@mui/icons-material/Folder';
 import FolderSharedIcon from '@mui/icons-material/FolderShared';
+import Footer from '../Footer/Footer.jsx';
 
 
 const drawerWidth = 240;
@@ -47,9 +48,10 @@ function ResponsiveDrawer(props) {
   const user = useSelector((state) => state.user);
   const picturePath = user.picturePath;
   const isNonMobileScreens = useMediaQuery("(min-width:390px)");
+  const [sharePage,setsharePage]=React.useState(true);
   
 
-  const settings = ['Profile', 'Account', 'Dashboard'];
+  const settings = ['Profile'];
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -92,7 +94,7 @@ function ResponsiveDrawer(props) {
       <List>
         
       <ListItem disablePadding>
-            <ListItemButton onClick={()=>{navigate('/')}}>
+            <ListItemButton onClick={()=>{setsharePage(true)}}>
               <ListItemIcon>
                   <FolderIcon />
               </ListItemIcon>
@@ -101,7 +103,7 @@ function ResponsiveDrawer(props) {
           </ListItem>
           <Divider />
           <ListItem disablePadding>
-            <ListItemButton onClick={navigateToSharedfiles}>
+            <ListItemButton onClick={()=>{setsharePage(false)}}>
               <ListItemIcon>
                   <FolderSharedIcon />
               </ListItemIcon>
@@ -140,7 +142,7 @@ function ResponsiveDrawer(props) {
             </IconButton>
             <AdbIcon sx={{ display: { xs: 'flex', }, mr: 1 }} />
             <Typography variant="h6" noWrap component="div">
-              Drive
+              xDrive
             </Typography>
           </Box>
           <Box>
@@ -165,11 +167,6 @@ function ResponsiveDrawer(props) {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>
-              ))}
               <MenuItem onClick={handleLogout}>
                 <Typography textAlign="center">Logout</Typography>
               </MenuItem>
@@ -193,7 +190,7 @@ function ResponsiveDrawer(props) {
             keepMounted: true, // Better open performance on mobile.
           }}
           sx={{
-            display: { xs: 'block', sm: 'none' },
+            display: { xs: 'block', sm: 'none',md: 'none' },
             '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, zIndex: 0 },
           }}
         >
@@ -223,9 +220,19 @@ function ResponsiveDrawer(props) {
         <DashHeader />
         {/* <NewPost/> */}
         <UploadComponent />
-        <FileRender />
+        {sharePage?<FileRender />:<SharedFilesRender/>}
+
+       
+        
+       
+        
+      
         
       </Box>
+          
+      
+
+      
     </Box>
   );
 }

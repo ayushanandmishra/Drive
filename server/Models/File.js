@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Person from "./Person.js";
 
 const FileSchema=mongoose.Schema(
     {
@@ -7,7 +8,11 @@ const FileSchema=mongoose.Schema(
         fileOwner:String,
         fileOwnerId:String,
         fileOwnerEmail:String,
-        fileSize:Number
+        fileSize:Number,
+        sharedWithIds: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Person', // Assuming you have a File model defined
+        }],
     }
 )
 

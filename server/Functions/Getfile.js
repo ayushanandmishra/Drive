@@ -30,7 +30,7 @@ export const getFile = async (req, res) => {
     },
     region: bucketRegion,
   });
-  console.log("inside getFile");
+
   try {
     // const files = await File.find({});
 
@@ -78,8 +78,30 @@ export const deleteFile=async(req,res)=>{
     try
     {
         const id = req.params.id;
-        console.log("the id is "+id);
+        const userId=req.params.userId;
         const file=await File.findById(id);
+
+        if(file.fileOwnerId!=userId)
+        {
+          return res.status(401).send('YOU CANNOT DELETE A FILE YOU DONT OWN')
+        }
+
+        const sharedWithIds = file.sharedWithIds || [];
+
+        const personsToUpdate = await Person.find({ _id: { $in: sharedWithIds } });
+
+        for (const person of personsToUpdate) {
+          const updatedSharedFilesIds = person.sharedFilesIds.filter(fileId => fileId !== id);
+          
+          // Update the Person document
+          await Person.findByIdAndUpdate(person._id, {
+            $set: { sharedFilesIds: updatedSharedFilesIds },
+          });
+        }
+
+        await Person.findByIdAndUpdate(file.fileOwnerId, {
+          $pull: { userfilesId: id },
+        });
 
         if(!file)
         {

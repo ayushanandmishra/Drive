@@ -11,7 +11,7 @@ const Navbar = () => {
       <AppBar  sx={{ margin: 0, padding: 0 }} position="sticky">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
-            Drive
+            xDrive
           </Typography>
           <AdbIcon />
         </Toolbar>

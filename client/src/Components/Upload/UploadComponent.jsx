@@ -2,7 +2,7 @@ import React from 'react';
 import FileUpload from './Upload.jsx';
 import { Box } from '@mui/material';
 
-const UploadComponent = ({change}) => {
+const UploadComponent = () => {
   const handleFileUpload = (files) => {
     // Perform actions with the selected files (e.g., upload to server)
     console.log('Selected Files:', files);
@@ -10,7 +10,7 @@ const UploadComponent = ({change}) => {
 
   return (
     <Box sx={{mt:3}}>
-      <FileUpload change={change} onFileUpload={handleFileUpload} />
+      <FileUpload onFileUpload={handleFileUpload} />
     </Box>
   );
 };

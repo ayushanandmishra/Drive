@@ -16,16 +16,19 @@ const App = () => {
   const [files,setFiles]=useState([]);
   const user=useSelector((state)=>state.user);
   const render=useSelector((state)=>state.render);
+  const token=useSelector((state)=>state.token);
   const id=user._id;
   console.log(id);
   const formData=new FormData();
   formData.append("id",id);
   const getFile = async () => {
       const response = await fetch(`http://localhost:3001/getfile/${id}`, {
-        method: "GET"
+        method: "GET",
+        headers: {
+          authorization: `Bearer ${token}`
+        }
       });
       const data = await response.json();
-      console.log(data);
       setFiles(data);
     };
     useEffect(()=>{
@@ -39,7 +42,7 @@ const App = () => {
   return (
     <div style={{marginTop:'2rem'}}>
       <h1>Your Files</h1>
-      <FileList files={files} />
+      <FileList sharedFiles={false}  files={files} />
     </div>
   );
 };

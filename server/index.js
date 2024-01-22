@@ -11,11 +11,13 @@ import { getFile,deleteFile } from "./Functions/Getfile.js";
 import { Signup,login } from "./Functions/Signup.js";
 import { verifytoken } from "./authentication/auth.js";
 import Person from "./Models/Person.js";
-import {shareFile,getSharedFiles} from "./Functions/ShareFile.js";
+import {shareFile,getSharedFiles,sharedWithInfo} from "./Functions/ShareFile.js";
+import {fileTypeFromBuffer} from 'file-type';
 
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 const app = express();
 app.use(cors());
 dotenv.config();
@@ -40,12 +42,13 @@ const upload2=multer({storage:storage2});
 
 
 
-app.get('/getfile/:userId',getFile);
-app.get('/getsharedfile/:userId',getSharedFiles);
+app.get('/getfile/:userId',verifytoken,getFile);
+app.get('/getsharedfile/:userId',verifytoken,getSharedFiles);
+app.get('/getsharedwith/:fileId',verifytoken,sharedWithInfo);
 app.post('/auth/login',login)
 app.post('/auth/register',upload2.single('picture'),Signup)
-app.delete('/deletefile/:id',deleteFile);
-app.post('/sharefile',shareFile)
+app.delete('/deletefile/:id/:userId',verifytoken,deleteFile);
+app.post('/sharefile',verifytoken,shareFile)
 
 
 
@@ -66,45 +69,49 @@ const s3=new S3Client({
 
 
 const random=Date.now();
-app.post("/api/posts",upload.single('image'),verifytoken,async(req,res)=>{
+app.post("/api/posts", upload.array('images', 10), verifytoken, async (req, res) => {
+  console.log('inside api of post');
+  console.log(req.body.id);
+  console.log(req.files);
+  console.log(Date.now());
 
-      console.log('insode api of post');
-      console.log(req.body.id);
-      console.log(req.file);
-      console.log(Date.now());
-    // req.file.buffer is the actual file 
+  const uploadedFiles = req.files;
 
-    const file=new File({
-      fileName:`${random}_${req.file.originalname}`,
-      fileType:req.file.mimetype.split('/')[1],
-      fileOwner:req.body.username,
-      fileOwnerId:req.body.id,
-      fileOwnerEmail:req.body.email,
-      fileSize:req.file.size
-    })
+  for (const uploadedFile of uploadedFiles) {
+      const buffer = uploadedFile.buffer;
+      const typeInfo = await fileTypeFromBuffer(buffer);
 
-    const savedFile = await file.save();
+      const file = new File({
+          fileName: `${uploadedFile.originalname.split('.')[0]}_${random}.${uploadedFile.originalname.split('.')[1]}`,
+          fileType: typeInfo?.ext || 'n/a',
+          fileOwner: req.body.username,
+          fileOwnerId: req.body.id,
+          fileOwnerEmail: req.body.email,
+          fileSize: uploadedFile.size
+      });
 
-    const person = await Person.findOneAndUpdate(
-      { _id: req.body.id },
-      { $push: { userfilesId: savedFile._id } },
-      { new: true } // To get the updated document
-  );
+      const savedFile = await file.save();
 
-    console.log(savedFile);
-    console.log(person);
+      await Person.findOneAndUpdate(
+          { _id: req.body.id },
+          { $push: { userfilesId: savedFile._id } },
+          { new: true }
+      );
 
-    const params = {
-      Bucket: bucketName,
-      Key: `${random}_${req.file.originalname}`,
-      Body: req.file.buffer,
-      ContentType:req.file.mimetype
-    };
-    const uploadCommand = new PutObjectCommand(params);
-    const uploadResult = await s3.send(uploadCommand);
-    console.log('File uploaded successfully. S3 URL:', uploadResult);
-    res.send({});
-})
+      const params = {
+          Bucket: bucketName,
+          Key: `${uploadedFile.originalname.split('.')[0]}_${random}.${uploadedFile.originalname.split('.')[1]}`,
+          Body: uploadedFile.buffer,
+          ContentType: uploadedFile.mimetype
+      };
+      const uploadCommand = new PutObjectCommand(params);
+      await s3.send(uploadCommand);
+
+      console.log(`File ${uploadedFile.originalname} uploaded successfully.`);
+  }
+
+  res.send({});
+});
 
 
 
