@@ -8,7 +8,7 @@ export const AllFiles=()=>{
           method: "GET"
         });
         const data = await response.json();
-        console.log(data);
+       
         setFiles(data);
       };
 

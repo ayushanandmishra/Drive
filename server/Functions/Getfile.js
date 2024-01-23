@@ -74,12 +74,18 @@ export const deleteFile=async(req,res)=>{
       },
       region: bucketRegion,
     });
-    console.log('inside delete function');
+    
     try
     {
         const id = req.params.id;
         const userId=req.params.userId;
         const file=await File.findById(id);
+
+        if(!file)
+        {
+            res.status(404).send("File Not Found");
+            return;
+        }
 
         if(file.fileOwnerId!=userId)
         {
@@ -89,10 +95,13 @@ export const deleteFile=async(req,res)=>{
         const sharedWithIds = file.sharedWithIds || [];
 
         const personsToUpdate = await Person.find({ _id: { $in: sharedWithIds } });
-
+       
         for (const person of personsToUpdate) {
-          const updatedSharedFilesIds = person.sharedFilesIds.filter(fileId => fileId !== id);
+
+  
+          const updatedSharedFilesIds = person.sharedFilesIds.filter(fileId => fileId != id);
           
+        
           // Update the Person document
           await Person.findByIdAndUpdate(person._id, {
             $set: { sharedFilesIds: updatedSharedFilesIds },
@@ -103,11 +112,7 @@ export const deleteFile=async(req,res)=>{
           $pull: { userfilesId: id },
         });
 
-        if(!file)
-        {
-            res.status(404).send("File Not Found");
-            return;
-        }
+        
 
         const params={
             Bucket:bucketName,

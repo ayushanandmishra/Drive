@@ -72,7 +72,7 @@ export default function SignInSide() {
       }
     );
     const loggedIn=await loggedInResponse.json();
-    console.log(loggedIn);
+  
       
     if (loggedIn.token) {
       dispatch(

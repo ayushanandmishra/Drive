@@ -4,7 +4,7 @@ import Person from "../Models/Person.js";
 
 export async function Signup(req,res)
 {   
-    console.log("inside signup");
+    
     try
     {
         const{
@@ -38,12 +38,12 @@ export async function Signup(req,res)
 
 export const login=async(req,res)=>{
 
-    console.log("inside login function");
+   
     try
     {   
         const {email,password}=req.body;
         const person=await Person.findOne({email:email});
-        console.log(person);
+      
 
         if(!person)
         {

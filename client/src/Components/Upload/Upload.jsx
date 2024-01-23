@@ -7,7 +7,7 @@ import { useSelector } from "react-redux"
 import { setRender } from '../../reduxStore/state';
 import { useDispatch } from 'react-redux';
 import Typography from '@mui/material/Typography';
-import Loader from '../Loader';
+import Loader2 from '../Loader2';
 import './Upload.css';
 
 
@@ -125,7 +125,7 @@ const FileUpload = ({ onFileUpload }) => {
         <Typography variant="body2" color="text.secondary">
           File is being uploaded
         </Typography>
-        <Loader />
+        <Loader2/>
       </Box>
 
       )}

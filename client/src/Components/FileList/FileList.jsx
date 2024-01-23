@@ -34,6 +34,8 @@ import DeleteConfirmationModal from './DeleteConfirmModal';
 import VideoFileIcon from '@mui/icons-material/VideoFile';
 
 
+
+
 const File = ({ fileName, fileType, fileOwner, fileSize = 32456, fileId, fileurl, sharedFiles }) => {
 
     const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -100,7 +102,7 @@ const File = ({ fileName, fileType, fileOwner, fileSize = 32456, fileId, fileurl
 
     const handleShareFile = (sharedEmails) => {
         // Implement your file-sharing logic here using the sharedEmails
-        console.log('Sharing file with emails:', sharedEmails);
+       
         // You can make an API call to share the file with the listed emails
         // Close the modal after sharing
         handleCloseShareModal();
@@ -323,6 +325,9 @@ const File = ({ fileName, fileType, fileOwner, fileSize = 32456, fileId, fileurl
 };
 
 const FileList = ({ files, sharedFiles }) => {
+
+   
+      
     return (
         <List>
             {files.map((file, index) => (
@@ -337,7 +342,9 @@ const FileList = ({ files, sharedFiles }) => {
                     sharedFiles={sharedFiles}
                 />
             ))}
+            
         </List>
+        
     );
 };
 

@@ -11,7 +11,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 export const shareFile = async (req, res) => {
 
   const { email, fileId } = req.body;
-  console.log(req.body);
+ 
 
 
   try {
@@ -52,7 +52,7 @@ export const shareFile = async (req, res) => {
 export const getSharedFiles = async (req, res) => {
 
   const { userId } = req.params;
-  console.log(userId)
+ 
 
   const bucketName = process.env.BUCKET_NAME;
   const bucketRegion = process.env.BUCKET_REGION;
@@ -103,7 +103,7 @@ export const sharedWithInfo = async (req, res) => {
 
   
   const { fileId } = req.params;
-  console.log('insdie sharedWithInfo '+fileId);
+ 
   try {
    
     const file = await File.findById(fileId);

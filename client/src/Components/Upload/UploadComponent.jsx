@@ -5,7 +5,7 @@ import { Box } from '@mui/material';
 const UploadComponent = () => {
   const handleFileUpload = (files) => {
     // Perform actions with the selected files (e.g., upload to server)
-    console.log('Selected Files:', files);
+  
   };
 
   return (

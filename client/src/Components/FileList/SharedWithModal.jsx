@@ -31,7 +31,7 @@ const ShareWithModal = ({ fileId, onClose }) => {
 
         if (response) {
           const data = await response.json();
-          console.log("data "+JSON.stringify(data));
+          
           setSharedInfo(data.sharedInfo || []);
         } else {
           console.error('Error fetching shared info:', response.statusText);

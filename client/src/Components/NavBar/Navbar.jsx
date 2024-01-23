@@ -34,6 +34,7 @@ import { useParams } from 'react-router-dom';
 import FolderIcon from '@mui/icons-material/Folder';
 import FolderSharedIcon from '@mui/icons-material/FolderShared';
 import Footer from '../Footer/Footer.jsx';
+import AboutDeveloperModal from '../AboutDevloper/AboutDevloperModal.jsx'
 
 
 const drawerWidth = 240;
@@ -42,16 +43,25 @@ function ResponsiveDrawer(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
+  const [openModal, setOpenModal] = React.useState(false);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
   const picturePath = user.picturePath;
   const isNonMobileScreens = useMediaQuery("(min-width:390px)");
-  const [sharePage,setsharePage]=React.useState(true);
-  
+  const [sharePage, setsharePage] = React.useState(true);
+
 
   const settings = ['Profile'];
+
+  const openModalfun = () => {
+    setOpenModal(true);
+  }
+
+  const closeModalfun = () => {
+    setOpenModal(false);
+  }
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -84,7 +94,7 @@ function ResponsiveDrawer(props) {
     navigate('/');
   }
 
-  const navigateToSharedfiles=()=>{
+  const navigateToSharedfiles = () => {
     navigate('/sharedfiles');
   }
   const drawer = (
@@ -92,25 +102,25 @@ function ResponsiveDrawer(props) {
       <Toolbar />
       <Divider />
       <List>
-        
-      <ListItem disablePadding>
-            <ListItemButton onClick={()=>{setsharePage(true)}}>
-              <ListItemIcon>
-                  <FolderIcon />
-              </ListItemIcon>
-              <ListItemText primary={'Your Files'} />
-            </ListItemButton>
-          </ListItem>
-          <Divider />
-          <ListItem disablePadding>
-            <ListItemButton onClick={()=>{setsharePage(false)}}>
-              <ListItemIcon>
-                  <FolderSharedIcon />
-              </ListItemIcon>
-              <ListItemText primary={'Shared Files'} />
-            </ListItemButton>
-          </ListItem>  
-        
+
+        <ListItem disablePadding>
+          <ListItemButton onClick={() => { setsharePage(true) }}>
+            <ListItemIcon>
+              <FolderIcon />
+            </ListItemIcon>
+            <ListItemText primary={'Your Files'} />
+          </ListItemButton>
+        </ListItem>
+        <Divider />
+        <ListItem disablePadding>
+          <ListItemButton onClick={() => { setsharePage(false) }}>
+            <ListItemIcon>
+              <FolderSharedIcon />
+            </ListItemIcon>
+            <ListItemText primary={'Shared Files'} />
+          </ListItemButton>
+        </ListItem>
+
       </List>
       <Divider />
     </div>
@@ -167,9 +177,15 @@ function ResponsiveDrawer(props) {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
+
+              <MenuItem onClick={openModalfun}>
+                <Typography textAlign="center">About Dev</Typography>
+              </MenuItem>
+
               <MenuItem onClick={handleLogout}>
                 <Typography textAlign="center">Logout</Typography>
               </MenuItem>
+
             </Menu>
           </Box>
         </Toolbar>
@@ -190,7 +206,7 @@ function ResponsiveDrawer(props) {
             keepMounted: true, // Better open performance on mobile.
           }}
           sx={{
-            display: { xs: 'block', sm: 'none',md: 'none' },
+            display: { xs: 'block', sm: 'none', md: 'none' },
             '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, zIndex: 0 },
           }}
         >
@@ -220,19 +236,16 @@ function ResponsiveDrawer(props) {
         <DashHeader />
         {/* <NewPost/> */}
         <UploadComponent />
-        {sharePage?<FileRender />:<SharedFilesRender/>}
+        {sharePage ? <FileRender /> : <SharedFilesRender />}
 
-       
-        
-       
-        
-      
-        
+
       </Box>
-          
-      
 
-      
+
+      <Box>
+        {openModal && <AboutDeveloperModal open={openModalfun} handleClose={closeModalfun} />}
+      </Box>
+
     </Box>
   );
 }

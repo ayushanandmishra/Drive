@@ -15,6 +15,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import Dropzone from "react-dropzone";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import { fileTypeFromBuffer } from 'file-type';
 
 function Copyright(props) {
     return (
@@ -49,6 +50,12 @@ export default function SignUpForm() {
     }
 
     const handleProfilePicture = async (file) => {
+        const allowedImageTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+
+        if(!allowedImageTypes.includes(file[0].type))
+        {
+           return window.alert('Only image files are accepted');
+        }
         setPictureFile(file);
         setPicturePath(file[0].path);
     };
@@ -57,7 +64,7 @@ export default function SignUpForm() {
         event.preventDefault();
         console.log("inside handle submit");
 
-        const newFormData={...formData,picturePath:picturePath,picture:pictureFile[0]}
+        const newFormData={...formData,picturePath:picturePath?picturePath:null,picture:pictureFile?pictureFile[0]:null}
 
         const formValues = new FormData(); //FormData is used because multer doesn't work with json type form data, it needs multipart form data which FormData provides
 
