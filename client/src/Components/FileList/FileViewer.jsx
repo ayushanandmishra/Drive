@@ -8,7 +8,7 @@ const FileViewer = () => {
 
   const {encfileUrl,encfileType}=useParams();
 
-  console.log(encfileUrl);
+  
   const fileurl=decodeURIComponent(encfileUrl);
   const fileType=decodeURIComponent(encfileType);
   return (

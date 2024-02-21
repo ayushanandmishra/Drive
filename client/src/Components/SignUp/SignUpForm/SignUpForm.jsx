@@ -49,6 +49,14 @@ export default function SignUpForm() {
         setFormData({ ...formData });
     }
 
+    function isValidEmail(email) {
+        // Regular expression for a valid email address
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      
+        // Test the email against the regex
+        return emailRegex.test(email);
+      }
+
     const handleProfilePicture = async (file) => {
         const allowedImageTypes = ['image/jpeg', 'image/png', 'image/jpg'];
 
@@ -62,7 +70,11 @@ export default function SignUpForm() {
 
     const handleSubmit = async(event) => {
         event.preventDefault();
-        console.log("inside handle submit");
+        
+        if(!isValidEmail(formData.email))
+        {
+            return window.alert('Invalid email entered');
+        }
 
         const newFormData={...formData,picturePath:picturePath?picturePath:null,picture:pictureFile?pictureFile[0]:null}
 

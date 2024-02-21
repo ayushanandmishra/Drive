@@ -19,7 +19,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-app.use(cors());
+app.use(cors()); 
 dotenv.config();
 app.use(express.json());
 app.use("/assets", express.static(path.join(__dirname, "public/assets")));
@@ -102,6 +102,8 @@ app.post("/api/posts", upload.array('images', 20), verifytoken, async (req, res)
         ContentType: uploadedFile.mimetype
       };
       const uploadCommand = new PutObjectCommand(params);
+      
+
       await s3.send(uploadCommand);
 
       console.log(`File ${uploadedFile.originalname} uploaded successfully.`);

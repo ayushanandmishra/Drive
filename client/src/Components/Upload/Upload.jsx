@@ -150,7 +150,7 @@ const FileUpload = ({ onFileUpload }) => {
           variant="contained"
           color="success"
           onClick={handleUpload}
-          disabled={!selectedFiles}
+          disabled={!selectedFiles || uploading}
         >
           {isNonMobileScreens ? 'Upload' : <CloudUploadIcon />}
         </Button>
