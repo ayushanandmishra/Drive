@@ -5,10 +5,12 @@
 - React
 - Nodejs
 - MongoDB
+- AWS S3
+- AWS EC2
 - Material UI
 - Redux Toolkit
 - JSON Web Token
-- Chat Engine io
+
 
 ## Description
 
@@ -18,7 +20,7 @@ The React frontend and Node.js backend ensure a responsive and reliable experien
 Experience seamless functionality, beautiful UI, and robust security in our comprehensive web solution.
 
 ## Features
-My website enables users to upload various file types including video,audio,images and various formats of documents
+My website enables users to upload various file types including video, audio, images and various other formats of documents
 
 HomePage
 ![Home Page](https://github.com/ayushanandmishra/Drive/blob/b0526ba141b008ad8e921e9ab1d09aa4b50dfdbe/server/public/assets/homepage.png)
